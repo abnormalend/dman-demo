@@ -1,0 +1,57 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+const posts: CollectionEntry<'blog'>[] = await getCollection('blog');
+// sort by date desc
+posts.sort(
+  (a: CollectionEntry<'blog'>, b: CollectionEntry<'blog'>) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blog | Diallo Wallace</title>
+  </head>
+  <body>
+    <main>
+      <h1>Blog</h1>
+      <ul class="post-list" role="list">
+        {posts.map((post) => (
+          <li class="post">
+            <a class="title" href={`/blog/${post.slug}/`}>{post.data.title}</a>
+            <div class="meta">
+              <time datetime={(post.data.pubDate as Date).toISOString()}>
+                {(post.data.pubDate as Date).toLocaleDateString()}
+              </time>
+              {post.data.tags && post.data.tags.length > 0 && (
+                <span class="tags">• {post.data.tags.join(', ')}</span>
+              )}
+            </div>
+            {post.data.description && <p class="desc">{post.data.description}</p>}
+          </li>
+        ))}
+      </ul>
+    </main>
+  </body>
+</html>
+
+<style>
+  :root {
+    --accent: 102, 217, 255;
+    --accent-light: 178, 235, 242;
+    --accent-dark: 8, 14, 36;
+  }
+  html { background: #0b1020; color: white; font-family: system-ui, sans-serif; }
+  body { margin: 0; }
+  main { margin: auto; padding: 1rem; width: 800px; max-width: calc(100% - 2rem); line-height: 1.7; }
+  h1 { margin: 1rem 0 1.5rem; }
+  .post-list { padding: 0; display: grid; gap: 1rem; }
+  .post { list-style: none; padding: 1rem; border: 1px solid rgba(var(--accent-light), 0.25); border-radius: 8px; background: linear-gradient(rgba(var(--accent-dark), 0.66), rgba(var(--accent-dark), 0.33)); }
+  .title { color: white; font-weight: 600; text-decoration: none; }
+  .title:hover { color: rgb(var(--accent)); }
+  .meta { color: rgba(255,255,255,0.75); font-size: 0.9rem; margin-top: 0.25rem; }
+  .desc { margin: 0.5rem 0 0; color: rgba(255,255,255,0.9); }
+</style>

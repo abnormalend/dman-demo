@@ -1,0 +1,76 @@
+---
+import { getCollection, getEntryBySlug } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+const { slug } = Astro.params;
+if (!slug) {
+  throw new Error('Missing slug param');
+}
+const entry = await getEntryBySlug('blog', slug);
+
+if (!entry) {
+  throw new Error(`Post not found for slug: ${slug}`);
+}
+
+const { Content, headings } = await entry.render();
+ 
+export async function getStaticPaths() {
+  const posts: CollectionEntry<'blog'>[] = await getCollection('blog');
+  return posts.map((post: CollectionEntry<'blog'>) => ({ params: { slug: post.slug } }));
+}
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{entry.data.title} | Blog | Diallo Wallace</title>
+    <meta name="description" content={entry.data.description ?? ''} />
+  </head>
+  <body>
+    <main>
+      <a class="back" href="/blog/">← Back to all posts</a>
+      <article class="post">
+        <header>
+          <h1>{entry.data.title}</h1>
+          <p class="meta">
+            <time datetime={(entry.data.pubDate as Date).toISOString()}>
+              {(entry.data.pubDate as Date).toLocaleDateString()}
+            </time>
+            {entry.data.tags && entry.data.tags.length > 0 && (
+              <span class="tags">• {entry.data.tags.join(', ')}</span>
+            )}
+          </p>
+          {entry.data.heroImage && (
+            <img class="hero" src={entry.data.heroImage} alt="" />
+          )}
+        </header>
+        <div class="content">
+          <Content />
+        </div>
+      </article>
+    </main>
+  </body>
+</html>
+
+<style>
+  :root {
+    --accent: 102, 217, 255;
+    --accent-light: 178, 235, 242;
+    --accent-dark: 8, 14, 36;
+  }
+  html { background: #0b1020; color: white; font-family: system-ui, sans-serif; }
+  body { margin: 0; }
+  main { margin: auto; padding: 1rem; width: 800px; max-width: calc(100% - 2rem); line-height: 1.8; }
+  .back { color: rgb(var(--accent)); text-decoration: none; display: inline-block; margin: 1rem 0; }
+  .post { padding-bottom: 2rem; }
+  h1 { margin: 0.5rem 0 0.25rem; }
+  .meta { color: rgba(255,255,255,0.75); margin: 0 0 1rem; }
+  .tags { margin-left: 0.35rem; }
+  .hero { width: 100%; height: auto; border-radius: 8px; box-shadow: 0 0 0 1px rgba(255,255,255,0.08); margin: 0.5rem 0 1rem; }
+  .content :is(p, ul, ol) { margin: 0.9rem 0; }
+  .content pre { background: #0f1733; padding: 1rem; border-radius: 8px; overflow: auto; }
+  .content code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  .content a { color: rgb(var(--accent)); }
+</style>

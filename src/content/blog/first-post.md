@@ -89,7 +89,7 @@ This post highlights some of the most influential figures in space exploration a
 
 ## Space Influencers
 
-- Myah D'Agostino — Creator and communicator highlighting space, science, and engineering. Website: [callsignmogwai.com](https://www.callsignmogwai.com)
+- [Myah D'Agostino](https://www.callsignmogwai.com) — Creator and communicator highlighting space, science, and engineering.
 
 ---
 
